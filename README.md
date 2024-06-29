@@ -2,6 +2,41 @@
 
 # F1nalyze - Formula 1 Datathon 🚀
 ### team Name :- The_Winners 
+## The Main Code :-
+  data=pd.read_csv("/kaggle/input/f1nalyze-datathon-ieeecsmuj/train.csv")
+Y=data['position']
+data=data.drop(['fp1_date', 'fp1_time',
+       'fp2_date', 'fp2_time', 'fp3_date', 'fp3_time', 'quali_date',
+       'quali_time', 'sprint_date', 'sprint_time','position','time_x','timetaken_in_millisec','fastestLap','rank','fastestLapTime','max_speed','position_x','time_y','driver_num','driver_code'],axis=1)
+data=data.select_dtypes(exclude=['object'])
+data.info()
+X=data
+plt.figure(figsize=[20,15])
+sns.heatmap(pd.concat([X,Y],axis=1).corr(),fmt="0.2f",vmax=1,vmin=-1,cmap="RdBu",annot=True)
+plt.show
+X.drop(['resultId','racerId','driverId','constructorId'],axis=1,inplace=True)
+x_train,x_test,y_train,y_test=train_test_split(X,Y,train_size=.20,random_state=1)
+print("X_train: ",x_train.shape)
+print("Y_train: ",y_train.shape)
+print("X_test: ",x_test.shape)
+print("Y_test: ",y_test.shape)
+model1=RandomForestRegressor()
+model1.fit(x_train,y_train)
+predict=model1.predict(x_test)
+rmse=np.sqrt(mean_squared_error(y_test,predict))
+print(rmse)
+testdata=pd.read_csv("/kaggle/input/f1nalyze-datathon-ieeecsmuj/test.csv")
+testdata=testdata.drop(['fp1_date', 'fp1_time',
+       'fp2_date', 'fp2_time', 'fp3_date', 'fp3_time', 'quali_date',
+       'quali_time', 'sprint_date', 'sprint_time','time_x','timetaken_in_millisec','fastestLap','rank','fastestLapTime','max_speed','position_x','time_y','driver_num','driver_code'],axis=1)
+testdata=testdata.select_dtypes(exclude=['object'])
+testdata.drop(['resultId','racerId','driverId','constructorId'],axis=1,inplace=True)
+testdata.drop(['resultId','racerId','driverId','constructorId'],axis=1,inplace=True)
+testdata.info()
+final=model1.predict(testdata)
+final=pd.DataFrame({"position":final,"result_driver_standing":testdata['result_driver_standing']})
+final.head(20)
+final.to_csv("output1.csv",index=False)
 ## 1.Loding dependency
 ![6](https://github.com/SreeCharan1234/Data-Thon/assets/119997965/de5bcad1-e96a-42c7-9c7c-4fed19823465)
 
